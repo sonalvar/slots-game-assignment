@@ -56,9 +56,9 @@ export class SlotMachine {
     private createReels(): void {
         // Create each reel
         for (let i = 0; i < REEL_COUNT; i++) {
-            const reel = new Reel(SYMBOLS_PER_REEL, SYMBOL_SIZE);
-            reel.container.y = i * (REEL_HEIGHT + REEL_SPACING);
-            this.container.addChild(reel.container);
+            const reel = new Reel({ symbolCount: SYMBOLS_PER_REEL });
+            reel.y = i * (REEL_HEIGHT + REEL_SPACING);
+            this.container.addChild(reel);
             this.reels.push(reel);
         }
     }
