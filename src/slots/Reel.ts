@@ -17,6 +17,11 @@ const SYMBOL_GAP = 10;
 const SYMBOL_STRIDE = SYMBOL_WIDTH + SYMBOL_GAP;
 const DEFAULT_SYMBOL_COUNT = 6;
 
+const LEFT_BOUNDARY = -SYMBOL_STRIDE;
+const STOP_SPEED_THRESHOLD = 0.8;
+const SNAP_TOLERANCE = 2;
+const SNAP_EASING = 0.4;
+
 export type ReelState = 'idle' | 'spinning';
 
 export interface ReelOptions {
@@ -77,14 +82,43 @@ export class Reel extends PIXI.Container {
     return AssetLoader.getTexture(name);
   }
 
-  /**
-   * Start spinning: sets initial speed parameters.
-   */
+  private recycleIfNeeded(): void {
+    for (const sprite of this.symbols) {
+      if (sprite.x + SYMBOL_WIDTH < 0) {
+        const rightmost = Math.max(...this.symbols.map(s => s.x));
+        sprite.x = rightmost + SYMBOL_STRIDE;
+        sprite.texture = this.getRandomTexture();
+        (sprite as any).__name = (sprite.texture as any).name || (sprite.texture as any).textureCacheIds?.[0];
+      }
+    }
+    this.symbols.sort((a, b) => a.x - b.x);
+  }
+
+  private performSnap(delta: number): void {
+    const leftmost = this.symbols[0];
+    const offset = leftmost.x;
+    const targetOffset = Math.round(offset / SYMBOL_STRIDE) * SYMBOL_STRIDE;
+    const diff = targetOffset - offset;
+
+    if (Math.abs(diff) <= SNAP_TOLERANCE) {
+      const finalizeShift = diff;
+      this.symbols.forEach(s => { s.x += finalizeShift; });
+      this.snapping = false;
+      this.state = 'idle';
+      this.emit('stopped');
+      return;
+    }
+
+    const shift = diff * SNAP_EASING * delta;
+    this.symbols.forEach(s => { s.x += shift; });
+  }
+
   public startSpin(): void {
     if (this.state === 'spinning') return;
     this.state = 'spinning';
     this.speed = 0;
     this.targetSpeed = this.maxSpeed;
+    this.snapping = false;
   }
 
   /**
@@ -97,17 +131,29 @@ export class Reel extends PIXI.Container {
   public update(delta: number): void {
     if (this.state !== 'spinning') return;
 
-    if (this.speed < this.targetSpeed) {
-      this.speed = Math.min(this.targetSpeed, this.speed + this.acceleration * delta);
-    } else if (this.speed > this.targetSpeed) {
-      // Decelerate toward target
-      this.speed *= this.decelRate;
-      if (this.speed < 0.5) {
-        this.speed = 0;
-        this.state = 'idle';
+    if (!this.snapping) {
+      if (this.speed < this.targetSpeed) {
+        this.speed = Math.min(this.targetSpeed, this.speed + this.acceleration * delta);
+      } else if (this.speed > this.targetSpeed) {
+        this.speed *= this.decelRate;
+        if (this.speed < STOP_SPEED_THRESHOLD && this.targetSpeed === 0) {
+          this.speed = 0;
+          this.snapping = true;
+        }
       }
     }
 
+    if (this.snapping) {
+      this.performSnap(delta);
+      return;
+    }
+
+    if (this.speed > 0) {
+      for (const sprite of this.symbols) {
+        sprite.x -= this.speed * delta;
+      }
+      this.recycleIfNeeded();
+    }
   }
 
   /**
@@ -134,5 +180,9 @@ export class Reel extends PIXI.Container {
    */
   public getSymbolPositions(): number[] {
     return this.symbols.map(s => s.x);
+  }
+
+  public _isSnapping(): boolean {
+    return this.snapping;
   }
 }

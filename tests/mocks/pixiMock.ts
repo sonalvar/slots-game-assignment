@@ -20,11 +20,29 @@ export class Texture {
     get: (name: string) => Texture.from(name),
   };
   
-  export const Container = class {
+  export class Container {
     children: any[] = [];
-    addChild(child: any) { this.children.push(child); return child; }
-    removeChild(child: any) { this.children = this.children.filter(c => c !== child); }
-  };
+    private _listeners: Record<string, Function[]> = {};
+  
+    addChild(child: any) {
+      this.children.push(child);
+      return child;
+    }
+    removeChild(child: any) {
+      this.children = this.children.filter(c => c !== child);
+    }
+  
+    on(event: string, fn: Function, context?: any) {
+      this._listeners[event] = this._listeners[event] || [];
+      this._listeners[event].push(fn.bind(context || this));
+      return this;
+    }
+  
+    emit(event: string, ...args: any[]) {
+      (this._listeners[event] || []).forEach(fn => fn(...args));
+      return this;
+    }
+  }
   
   export const Application = class {
     stage = new Container();
