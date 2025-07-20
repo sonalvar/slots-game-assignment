@@ -12,41 +12,61 @@
     "test:ci": "jest --coverage --runInBand"
   },
   "dependencies": {
+    "howler": "^2.2.4",
     "pixi-spine": "^4.0.4",
     "pixi.js": "^7.3.2"
   },
   "devDependencies": {
+    "@types/howler": "^2.2.12",
+    "@types/jest": "^29.5.12",
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
     "copy-webpack-plugin": "^11.0.0",
     "eslint": "^8.56.0",
+    "fast-check": "^3.17.1",
     "html-webpack-plugin": "^5.5.3",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "ts-jest": "^29.1.2",
     "ts-loader": "^9.5.1",
     "typescript": "^5.5.3",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.1",
-    "@types/jest": "^29.5.12",
-    "jest": "^29.7.0",
-    "jest-environment-jsdom": "^29.7.0",
-    "ts-jest": "^29.1.2",
-    "fast-check": "^3.17.1"
+    "webpack-dev-server": "^4.15.1"
   },
   "private": true,
   "jest": {
     "preset": "ts-jest",
-    "globals": { "ts-jest": { "tsconfig": "tsconfig.jest.json" } },
+    "globals": {
+      "ts-jest": {
+        "tsconfig": "tsconfig.jest.json"
+      }
+    },
     "testEnvironment": "jsdom",
-    "roots": ["<rootDir>/src", "<rootDir>/tests"],
-    "moduleFileExtensions": ["ts", "tsx", "js", "json"],
-    "setupFilesAfterEnv": ["<rootDir>/tests/setupTests.ts"],
+    "roots": [
+      "<rootDir>/src",
+      "<rootDir>/tests"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "json"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setupTests.ts"
+    ],
     "collectCoverageFrom": [
       "src/**/*.{ts,tsx}",
       "!src/**/*.d.ts",
       "!src/**/index.{ts,tsx}"
     ],
     "coverageDirectory": "coverage",
-    "coverageReporters": ["text", "lcov", "html"],
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ],
     "coverageThreshold": {
       "global": {
         "branches": 70,
