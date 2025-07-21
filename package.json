@@ -23,6 +23,7 @@
     "@typescript-eslint/eslint-plugin": "^6.19.0",
     "@typescript-eslint/parser": "^6.19.0",
     "copy-webpack-plugin": "^11.0.0",
+    "danger": "^13.0.4",
     "eslint": "^8.56.0",
     "fast-check": "^3.17.1",
     "html-webpack-plugin": "^5.5.3",
