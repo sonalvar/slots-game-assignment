@@ -18,6 +18,9 @@ export class Texture {
   
   export const Assets = {
     get: (name: string) => Texture.from(name),
+    init: (_opts?: { basePath: string }) => { /* no‑op */ },
+    addBundle: (_bundleName: string, _bundle: any) => { /* no‑op */ },
+    loadBundle: async (_bundleName: string) => ({} as Record<string, any>),
   };
   
   export class Container {
